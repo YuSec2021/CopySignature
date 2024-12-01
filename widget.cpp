@@ -5,6 +5,8 @@
 #include "tools.h"
 #include "copysignature.h"
 
+#include <QMessageBox>
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
@@ -78,7 +80,7 @@ void Widget::copy() {
             csign->NoSigBuffer.bufferSize = nosigfileSize;
             if (csign->Copy()) {
                 if (tools::SaveFile(noSigFileName, csign->NewBuffer.pBuffer, csign->NewBuffer.bufferSize)) {
-                    printf("Success\r\n");
+                    QMessageBox::information(this, "Info", "Success Copy!");
                 }
             }
         }

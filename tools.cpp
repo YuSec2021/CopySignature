@@ -27,24 +27,27 @@ PCHAR tools::loadFile(IN LPCWSTR lpFileName, OUT PDWORD fileSize) {
     return NULL;
 }
 
-ADDRESS tools::RVAtoRAW(IN PIMAGE_SECTION_HEADER pSection, IN DWORD VirtualAddress, IN DWORD NumberOfSections) {
-    DWORD index = tools::CheckSection(pSection, VirtualAddress, NumberOfSections);
+ADDRESS tools::RVAtoRAW(IN PEBUFFER pBuffer, IN DWORD VirtualAddress) {
+    PIMAGE_SECTION_HEADER pSection = pBuffer.pFirstSection;
+    DWORD sectionCount = pBuffer.pNt->FileHeader.NumberOfSections;
+    DWORD index = tools::CheckSection(pSection, VirtualAddress, sectionCount);
     return VirtualAddress - pSection[index].VirtualAddress + pSection[index].PointerToRawData;
 }
 
-ADDRESS tools::RAWtoRVA(IN PIMAGE_SECTION_HEADER pSection, IN DWORD RAW, IN DWORD NumberOfSections) {
+ADDRESS tools::RAWtoRVA(IN PEBUFFER pBuffer, IN DWORD VirtualAddress) {
     return 0;
 }
 
 ADDRESS tools::CheckSection(IN PIMAGE_SECTION_HEADER pSection, IN DWORD VirtualAddress, IN DWORD NumberOfSections) {
-    for (int i = 0; i < NumberOfSections; i++) {
+
+    for (ULONG i = 0; i < NumberOfSections - 1; i++) {
         PIMAGE_SECTION_HEADER pTmp = &pSection[i];
         if (VirtualAddress >= pTmp->VirtualAddress
-            && VirtualAddress < pTmp->VirtualAddress + pTmp->Misc.VirtualSize) {
+            && VirtualAddress < (pTmp+1)->VirtualAddress) {
             return i;
         }
     }
-    return -1;
+    return NumberOfSections - 1;
 }
 
 BOOLEAN tools::CheckFileType(PCHAR imageBuffer) {
@@ -164,6 +167,7 @@ BOOLEAN tools::SaveFile(IN LPCWSTR lpFileName, IN PCHAR buffer, IN DWORD bufferS
     CloseHandle(hFile);
     return res;
 }
+
 
 LPCWSTR tools::ExtendString(LPCWSTR original, LPCWSTR toAppend) {
     size_t originalLength = wcslen(original);

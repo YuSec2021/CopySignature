@@ -1,17 +1,8 @@
 #ifndef COPYSIGNATURE_H
 #define COPYSIGNATURE_H
 #include <Windows.h>
+#include "tools.h"
 
-typedef struct _PEBUFFER{
-    PCHAR pBuffer;
-    DWORD bufferSize;
-
-    PIMAGE_NT_HEADERS pNt;
-    PIMAGE_SECTION_HEADER pFirstSection;
-
-    PIMAGE_DATA_DIRECTORY pSecDir;
-    PIMAGE_DATA_DIRECTORY pRelocDir;
-} PEBUFFER, *PPEBUFFER;
 
 class CopySignature
 {
